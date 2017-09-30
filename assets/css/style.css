@@ -12,7 +12,7 @@ body{
 
 h1{
 	text-align:center;
-	color:white;
+	color:plum;
 	font-family:'Fredoka One', cursive;
 	font-size:40px;
 	letter-spacing:2px;
@@ -33,11 +33,17 @@ a{
 	background:maroon;
 }
 
-.quiz{
+#quiz{
 	position:relative;
-	text-align:center;
+	width:60%;
+	margin:5px 20% 5px 20%;
 	font-family:'Patrick Hand SC', cursive;
 	font-size:20px;
+	color:lavender;
+}
+
+#countdown{
+	color:palegoldenrod;
 }
 
 button{
@@ -46,4 +52,11 @@ button{
 	width:75px;
 	height:35px;
 	border-radius:3px;
+	margin:40px 45%;
+	font-family:'Fredoka One', cursive;
+	color:plum;
+}
+
+#radio{
+	margin-left:10px;
 }

@@ -2,95 +2,110 @@ $(document).ready(function(){
 
 var quizBox = document.getElementById('quiz');
 var resultsBox = document.getElementById('results');
-var startButton = document.getElementById('start');
+var start = document.getElementById('start');
+var submit = document.getElementById('submit');
 
 var questions = [
 	{question: 'Which of the following movies was NOT made by Studio Ghibli?',
-	answers: {
-		a: 'Spirited Away', 
-		b: 'Your Name', 
-		c: "Kiki's Delivery Service", 
-		d: 'Castle In The Sky'
-	}, correctAnswer: 'b'
+	answers: ['Spirited Away', 'Your Name', "Kiki's Delivery Service", 'Castle In The Sky'],
+	correctAnswer: 'Your Name'
 	},
 	{question: 'Which Studio Ghibli movie is this screenshot from?',
-	answers: {
-		a: "Howl's Moving Castle", 
-		b: 'Princess Mononoke', 
-		c: 'Castle In The Sky', 
-		d: 'Spirited Away'
-	}, correctAnswer: 'c'
+	answers: ["Howl's Moving Castle", 'Princess Mononoke', 'Castle In The Sky', 'Spirited Away'],
+	correctAnswer: 'Castle In The Sky'
 	}, 
 	{question: 'Which movie of these four is the oldest?',
-	answers: {
-		a: 'Castle In The Sky',
-		b: 'Nausicaa Of The Valley Of The Wind',
-		c: 'Princess Mononoke',
-		d: 'Spirited Away',
-	}, correctAnswer: 'b',
+	answers: ['Castle In The Sky', 'Nausicaa Of The Valley Of The Wind', 'Princess Mononoke', 'Spirited Away'], 
+	correctAnswer: 'Nausicaa Of The Valley Of The Wind'
 	},
 	{question: 'Which movie has the highest rating on imdb?',
-	answers: {
-		a: 'Spirited Away',
-		b: 'My Neighbor Totoro',
-		c: "Howl's Moving Castle",
-		d: 'Ponyo',
-	}, correctAnswer: 'a',
+	answers: ['Spirited Away', 'My Neighbor Totoro', "Howl's Moving Castle", 'Ponyo'],
+	correctAnswer: 'Spirited Away'
 	}
 ];
 
-var triviaGame = {
+var timerRunning = false;
+var intervalId;
+
+var timer = {
 
 	time: 180,
 
-	quiz: function() {
-		const output = [];
-		questions.forEach((currentQ, questionNum) => {
-			const answers = [];
-			for(letter in currentQ.answers){
-				answers.push(`<label><input type='radio' name='question${questionNum}' value='${letter}'> 
-					${letter} : ${currentQ.answers[letter]} </label>`);
-				output.push(`<div class='question'> ${currentQ.question} </div>
-					<div class='answers'> ${answers.join('')}</div>`);
-			}
-		});
-
-		quizBox.innerHTML = output.join('');
-		$(startButton).remove();
-		$('#quiz').append("<button id='results'>Submit</button>")
+	start: function() {
+		if (!timerRunning){
+			intervalId = setInterval(timer.countdown, 1000);
+		}
 	},
 
+	countdown: function() {
+	    timer.time--;
+	    if (timer.time === 0) {
+	      console.log("Time's up!");
+	      triviaGame.over();
+	    }
+
+	    $("#countdown").html('<p>You have ' + timer.time + ' seconds left!</p>');
+  	},
+
+};
+
+var triviaGame = {
+
+	correct:0,
+	incorrect:0,
+	time:180,
+
+	quiz: function() {
+
+		if (!timerRunning){
+			intervalId = setInterval(timer.countdown, 1000);
+		};
+
+		for (var i = 0; i < questions.length; i++) {
+			$('#quiz').append("<p>" + questions[i].question + "</p>");
+			for (var j = 0; j < questions[i].answers.length; j++) {
+				$('#quiz').append("<input id='radio' type='radio' name='question-" + i + "' value='" + 
+				questions[i].answers[j] + "''>" + questions[i].answers[j]);
+			}
+		};
+
+		$('#quiz').append("<br><br><button id='results'>Submit</button>");
+
+		start.remove();	
+	},
 
 	countdown: function() {
-	    triviaGame.time--;
-	    $("#countdown").html(triviaGame.time);
-	    if (triviaGame.time === 0) {
+	    timer.time--;
+	    if (timer.time === 0) {
 	      console.log("Time's up!");
-	      game.over();
+	      triviaGame.over();
 	    }
+
+	    $("#countdown").html('<p>You have ' + timer.time + ' seconds left!</p>');
   	},
 
   	over: function() {
-  		const answerBoxes = quizBox.querySelectorAll('.answers');
-  		let numCorrect = 0;
-  		questions.forEach((currentQ, questionNum) => {
-  			const answerBox = answerBoxes[questionNum];
-  			const selector = 'input[name=question' +questionNum +']:checked';
-  			const userAnswer = (answerBox.querySelector(selector) || {}).value;
+  		$('#quiz').clear();
   		
-  			if(userAnswer===currentQ.correctAnswer){
-  				numCorrect++;
-  				answerBoxes[questionNum].style.color = 'lightgreen';
-  			} else{answerBoxes[questionNum].style.color = 'lightpink';}
+  		$.each($("input[name='question-0']:checked"), function(){
+  			if($(this).val() === questions[0].correctAnswer){
+  				triviaGame.correct++;
+  			} else {
+  				triviaGame.incorrect++;
+  			}
   		});
 
-  		resultsBox.innerHTML = numCorrect + ' out of ' + questions.length;
+  		$.each($("input[name='question-1':checked"), function(){
+  			if ($(this).val() ===questions[1].correctAnswer){
+  				triviaGame.correct++;
+  			}
+  		});
 
   	},
 
 	};
 
-$(startButton).click(triviaGame.quiz);
-$('#submit').click(triviaGame.over);
+$(start).click(triviaGame.quiz);
+$(submit).click(triviaGame.over);
 
 });
